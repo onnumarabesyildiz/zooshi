@@ -23,3 +23,7 @@ Butun lisansları toplicaz teknolojinize yarasan rahatca deneyin
 Hydration mistmatchleri idare edin 
 
 istedigini unutan bir AI devrinde gorusmek uzere meraklisi cok 
+
+Acik konusuyorum prompt engineering seviyesinde denicem bu projeyi 
+
+Teknoloji gelismis dediler geldik biz de 
