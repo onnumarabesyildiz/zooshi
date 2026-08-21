@@ -37,3 +37,5 @@ Bu heryer icin boyle
 Hakli
 
 Butun security ayarlarini actik paketimiz simdiden celik kivamda guvenebilirsiniz 
+
+Sadece Dijital beyin transferini test edecez derdimiz bu
