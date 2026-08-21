@@ -27,3 +27,5 @@ istedigini unutan bir AI devrinde gorusmek uzere meraklisi cok
 Acik konusuyorum prompt engineering seviyesinde denicem bu projeyi 
 
 Teknoloji gelismis dediler geldik biz de 
+
+Muhendislik meraklıları denemesin igrenebilir
