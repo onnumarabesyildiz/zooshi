@@ -6,4 +6,4 @@ Tepe tepe kullanin
 
 MIT dusunuyoruz
 
-Aboniliklerinizi biliyosunuz
+Aboneliklerinizi biliyosunuz gorduk tesekkurler
