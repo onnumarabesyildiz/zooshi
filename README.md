@@ -7,3 +7,5 @@ Tepe tepe kullanin
 MIT dusunuyoruz
 
 Aboneliklerinizi biliyosunuz gorduk tesekkurler
+
+galaktik like bekliyoruz hazirlanin ✌️
