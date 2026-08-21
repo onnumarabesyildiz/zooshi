@@ -17,3 +17,5 @@ os'i bile hazir
 Welcome to the Programme
 
 Sizin stil ordan burdan toplama paket dusunuyoruz entegrasyonu daha kolay.
+
+Butun lisansları toplicaz teknolojinize yarasan rahatca deneyin 
