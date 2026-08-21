@@ -31,3 +31,5 @@ Teknoloji gelismis dediler geldik biz de
 Muhendislik meraklıları denemesin igrenebilir
 
 Hakli
+
+Butun security ayarlarini actik paketimiz simdiden celik kivamda guvenebilirsiniz 
