@@ -11,3 +11,5 @@ Aboneliklerinizi biliyosunuz gorduk tesekkurler
 galaktik like bekliyoruz hazirlanin ✌️
 
 adina yakistiracaz 
+
+os'i bile hazir
