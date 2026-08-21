@@ -9,3 +9,5 @@ MIT dusunuyoruz
 Aboneliklerinizi biliyosunuz gorduk tesekkurler
 
 galaktik like bekliyoruz hazirlanin ✌️
+
+adina yakistiracaz 
