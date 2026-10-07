@@ -1,5 +1,10 @@
 Kim klonluyo lan repoyu lisansi gordunuz yakarim tarihten sonra mit falan degil.
 
+Githubmis lan security safsatasi arkada cekip duruyomus 
+
+`asdfghjkm,l./
+
+
 Dunyanin en basit kodunu bile haketmediniz deh
 
 # zooshi
