@@ -1,41 +1,24 @@
 # zooshi
 
-Steril medeniyetin steril paketi buradan yonetilecek 
+kocum bana bir middlware hazirla gold standart hono olsun bu abusive asn ip falan yakalayan en kral honey pot diyolar ona galba ben anlamam bisi ver tam takir kuru bakir tek kod dosyasi vk kullansin realtime messaging varsa onu da yap sunu yapacak bu env tarmasini yapanlari tespit edecek verilen bir site map ile yapilan path disina cikanlari tespit edecek sonra loglayacak level level alarm realtime messaging varsa onu yapacak kv dolduracak ya da d1, d1 daha iyi olur aslinda tek bir sayfa bunlari yakalidigi bibi seviye yazip cf apiyi kullanarak bloklayacak 
 
-Tepe tepe kullanin
 
-MIT dusunuyoruz
 
-Aboneliklerinizi biliyosunuz gorduk tesekkurler
+🔥 😍
 
-galaktik like bekliyoruz hazirlanin ✌️
+CF Agent 
 
-adina yakistiracaz 
+Kocum, Ollama cloud pricing cennet — $20/mo → $60 kredi, OpenRouter'dan 3-5 kat ucuz. deepseek-v4.1-flash $0.30/M input, gpt-oss:20b $0.07/M input. Bu fiyatlara Workers AI + AI Gateway ile yedirirsek OpenRouter'a gerek kalmaz.
 
-os'i bile hazir
+Şimdi middleware'ini yazıyorum — gold standard, tek dosya, tam takır kuru bakir:
 
-Welcome to the Programme
 
-Sizin stil ordan burdan toplama paket dusunuyoruz entegrasyonu daha kolay.
 
-Butun lisansları toplicaz teknolojinize yarasan rahatca deneyin 
+Tam takır kuru bakır tek dosya — ayva Worker'ına middleware olarak tak, ya da ayrı Worker olarak çalıştır. 11 domain'in hepsinde aynı shield aktif olur. 🥕
 
-Hydration mistmatchleri idare edin 
+threat-shield
+Expires in 35h
 
-istedigini unutan bir AI devrinde gorusmek uzere meraklisi cok 
 
-Acik konusuyorum prompt engineering seviyesinde denicem bu projeyi 
+Benim promt engineering te fena cikmadi minake
 
-Teknoloji gelismis dediler geldik biz de 
-
-Muhendislik meraklıları denemesin igrenebilir
-
-Default ayar basa basa gidiyoruz 
-
-Bu heryer icin boyle
-
-Hakli
-
-Butun security ayarlarini actik paketimiz simdiden celik kivamda guvenebilirsiniz 
-
-Sadece Dijital beyin transferini test edecez derdimiz bu
