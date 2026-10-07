@@ -1,6 +1,6 @@
 Kim klonluyo lan repoyu lisansi gordunuz yakarim tarihten sonra mit falan degil.
 
-Dunyanin en basit kodunu bile haketmeniz deh
+Dunyanin en basit kodunu bile haketmediniz deh
 
 # zooshi
 
