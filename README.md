@@ -1,3 +1,5 @@
+Kim klonluyo lan repoyu lisansi gordunuz yakarim tarihten sonra mit falan degil.
+
 # zooshi
 
 kocum bana bir middlware hazirla gold standart hono olsun bu abusive asn ip falan yakalayan en kral honey pot diyolar ona galba ben anlamam bisi ver tam takir kuru bakir tek kod dosyasi vk kullansin realtime messaging varsa onu da yap sunu yapacak bu env tarmasini yapanlari tespit edecek verilen bir site map ile yapilan path disina cikanlari tespit edecek sonra loglayacak level level alarm realtime messaging varsa onu yapacak kv dolduracak ya da d1, d1 daha iyi olur aslinda tek bir sayfa bunlari yakalidigi bibi seviye yazip cf apiyi kullanarak bloklayacak 
