@@ -28,4 +28,6 @@ hazirladik https://github.com/onnumarabesyildiz/zooshi/blob/main/🖕.ts
 
 Walla biz hashmap cekip her platform standart kullancaz giris standart destekli temiz. iOS alt bar ust bar dilenip duruyo tek site multi app yukle derken. Habire ana sayfa isityo giris noktasi susturacaz fakiri bir siteden sonsuz app yukleyecek manifest yedirebiliyoruz enayilere.
 
+Local storage da yapabiliriz ayni kapi yani ama ben taktim o urllere yani ioste neden calismiyo bu berbat platform urlleri bitirecez tam bir webOS
+
 afiyet olsun 
