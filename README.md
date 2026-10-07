@@ -26,4 +26,6 @@ Benim promt engineering te fena cikmadi minake
 bu arada bunu yillardir cross platform yazamayan OSS router pornoculara ozel 
 hazirladik https://github.com/onnumarabesyildiz/zooshi/blob/main/🖕.ts
 
+Walla biz hashmap cekip her platform standart kullancaz giris standart destekli temiz. iOS alt bar ust bar dilenip duruyo tek site multi app yukle derken. Habire ana sayfa isityo giris noktasi susturacaz fakiri bir siteden sonsuz app yukleyecek manifest yedirebiliyoruz enayilere.
+
 afiyet olsun 
