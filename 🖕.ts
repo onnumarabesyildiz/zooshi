@@ -1,6 +1,6 @@
 // Dunyanin en basit seyi yapamadiniz yiyin
 // Goruldugu uzere insan tarafindan en anlasilan ve en esnek dil olan JS nin sadece fonksiyal gucunu degil structered yapisini da bu saheserle goze vurduk
-// Ger turlu programlamadan anlariz sadece fonsiyonel deil, sizin gibi kutu kutu dek yonlu obje kutulayan sonra olmadi bu interface dagitan OOP kulturunuze karsiyiz.
+// Ger turlu programlamadan anlariz sadece fonsiyonel deil, sizin gibi kutu kutu tek yonlu obje kutulayan sonra olmadi bu interface dagitan OOP kulturunuze karsiyiz.
 
 // PERSONAL USE ONLY RIGHTS
 // 
