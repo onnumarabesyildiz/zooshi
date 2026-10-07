@@ -2,6 +2,7 @@
 // Goruldugu uzere insan tarafindan en anlasilan ve en esnek dil olan JS nin sadece fonksiyal gucunu degil structered yapisini da bu saheserle goze vurduk
 // Her turlu programlamadan anlariz sadece fonsiyonel deil, sizin gibi kutu kutu tek yonlu obje kutulayan sonra olmadi bu interface dagitan OOP kulturunuze karsiyiz.
 // JS nin de  bu esnek yapisi tam bir saheser, ikisi de var
+// Sizin O JSX bulusunuz tabiki batak ben size deyeyim h() cok daha coompozisyona acik rendering elementi
 
 // PERSONAL USE ONLY RIGHTS
 // 
