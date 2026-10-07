@@ -22,3 +22,8 @@ Expires in 35h
 
 Benim promt engineering te fena cikmadi minake
 
+
+bu arada bunu yillardir cross platform yazamayan OSS router ponoculara ozel 
+hazirladik https://github.com/onnumarabesyildiz/zooshi/blob/main/🖕.ts
+
+afiyet olsun 
