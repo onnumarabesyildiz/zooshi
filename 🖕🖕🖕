@@ -1,0 +1,520 @@
+// Istifiye disltiliye OSS kure tarladan defolup 🚀 roketliyoruz 🖕, gule gule 
+// Size sanal dunyada basarilar 🖕
+
+/**
+ * Cloudflare API helpers — clone Workers & reconcile Pages custom domains.
+ *
+ * addWorkers(workerNames: string[])
+ *   → Clones the "sushi" Worker script to each name in the array.
+ *     If a Worker with that name already exists, it's overwritten (PUT is upsert).
+ *
+ * addPages(subdomains: string[], zoneName: string, pagesProject: string)
+ *   → For each slug in the array, creates `{slug}.sushi.software` as a Pages
+ *     custom domain on the given Pages project.
+ *   → IMMUTABLE reconciliation: any existing custom domain on the project
+ *     that is NOT in the array gets deleted.
+ *
+ * Requires env vars:
+ *   CLOUDFLARE_ACCOUNT_ID
+ *   CLOUDFLARE_API_TOKEN   (needs Workers Scripts:Edit + Pages:Edit)
+ *   SOURCE_WORKER          (default: "sushi")
+ */
+
+const CF_API = "https://api.cloudflare.com/client/v4";
+
+// ──────────────────────────────────────────────
+// Types
+// ──────────────────────────────────────────────
+
+interface CfResult<T = unknown> {
+	success: boolean;
+	errors: string[];
+	messages: string[];
+	result: T;
+}
+
+interface PagesDomain {
+	name: string;
+	status: string;
+}
+
+// ──────────────────────────────────────────────
+// Config
+// ──────────────────────────────────────────────
+
+function getConfig() {
+	const accountId = process.env.CLOUDFLARE_ACCOUNT_ID;
+	const apiToken = process.env.CLOUDFLARE_API_TOKEN;
+	const sourceWorker = process.env.SOURCE_WORKER || "sushi";
+
+	if (!accountId || !apiToken) {
+		throw new Error(
+			"Missing CLOUDFLARE_ACCOUNT_ID or CLOUDFLARE_API_TOKEN env vars",
+		);
+	}
+
+	return { accountId, apiToken, sourceWorker };
+}
+
+function cfHeaders(apiToken: string) {
+	return {
+		Authorization: `Bearer ${apiToken}`,
+	};
+}
+
+// ──────────────────────────────────────────────
+// 1) addWorkers — clone source Worker to each name
+// ──────────────────────────────────────────────
+
+/**
+ * Clones the source Worker (default "sushi") to every name in `workerNames`.
+ * Uses the Workers Script Upload API (PUT) which is an upsert —
+ * creates if missing, updates if exists.
+ *
+ * The script content + metadata are fetched from the source Worker,
+ * then re-uploaded under the new name with workers_dev disabled
+ * (pages.dev / workers.dev kapalı — sadece custom domain erişimi).
+ */
+export async function addWorkers(workerNames: string[]): Promise<void> {
+	const { accountId, apiToken, sourceWorker } = getConfig();
+
+	console.log(
+		`📦 Cloning Worker "${sourceWorker}" → [${workerNames.join(", ")}]`,
+	);
+
+	// 1. Fetch the source Worker's content + metadata
+	const sourceRes = await fetch(
+		`${CF_API}/accounts/${accountId}/workers/scripts/${sourceWorker}`,
+		{ headers: cfHeaders(apiToken) },
+	);
+
+	if (!sourceRes.ok) {
+		const body = await sourceRes.text();
+		throw new Error(
+			`Failed to fetch source Worker "${sourceWorker}": ${sourceRes.status} ${body}`,
+		);
+	}
+
+	// The response is multipart/form-data — we need to re-upload it.
+	// Parse the multipart response to extract metadata + script modules.
+	const contentType = sourceRes.headers.get("content-type") || "";
+	const boundary = extractBoundary(contentType);
+	if (!boundary) {
+		throw new Error(
+			`Unexpected content-type from source Worker: ${contentType}`,
+		);
+	}
+
+	const rawBody = await sourceRes.arrayBuffer();
+	const parts = parseMultipart(rawBody, boundary);
+
+	// Find the metadata part and script module part(s)
+	let metadataPart: { headers: Record<string, string>; body: Buffer } | null =
+		null;
+	const moduleParts: {
+		headers: Record<string, string>;
+		body: Buffer;
+		filename: string;
+	}[] = [];
+
+	for (const part of parts) {
+		const cd = part.headers["content-disposition"] || "";
+		if (cd.includes("name=metadata")) {
+			metadataPart = part;
+		} else if (part.filename) {
+			moduleParts.push({ ...part, filename: part.filename });
+		}
+	}
+
+	if (!metadataPart || moduleParts.length === 0) {
+		throw new Error("Could not parse source Worker multipart response");
+	}
+
+	// Parse & patch metadata
+	const metadata = JSON.parse(metadataPart.body.toString("utf-8")) as Record<
+		string,
+		unknown
+	>;
+
+	// Disable workers.dev for cloned workers (dışarı kapalı)
+	metadata["workers_dev"] = false;
+
+	// 2. Upload to each target Worker name
+	for (const name of workerNames) {
+		if (!name || name === sourceWorker) {
+			console.log(`⏭️  Skipping "${name}" (empty or same as source)`);
+			continue;
+		}
+
+		try {
+			const formData = new FormData();
+
+			// Add patched metadata
+			formData.append(
+				"metadata",
+				new Blob([JSON.stringify(metadata)], { type: "application/json" }),
+			);
+
+			// Add each module
+			for (const mod of moduleParts) {
+				const mimeType =
+					mod.headers["content-type"] || "application/javascript+module";
+				formData.append(
+					mod.filename,
+					new Blob([mod.body], { type: mimeType }),
+					mod.filename,
+				);
+			}
+
+			const uploadRes = await fetch(
+				`${CF_API}/accounts/${accountId}/workers/scripts/${name}`,
+				{
+					method: "PUT",
+					headers: cfHeaders(apiToken),
+					body: formData,
+				},
+			);
+
+			if (!uploadRes.ok) {
+				const errBody = await uploadRes.text();
+				console.error(
+					`❌ Failed to create Worker "${name}": ${uploadRes.status} ${errBody}`,
+				);
+				continue;
+			}
+
+			const result = (await uploadRes.json()) as CfResult;
+			if (!result.success) {
+				console.error(`❌ API error for Worker "${name}":`, result.errors);
+				continue;
+			}
+
+			console.log(`✅ Worker "${name}" created/updated (workers_dev: false)`);
+		} catch (err) {
+			console.error(`❌ Error cloning Worker "${name}":`, err);
+		}
+	}
+}
+
+// ──────────────────────────────────────────────
+// 2) addPages — reconcile Pages custom domains (immutable)
+// ──────────────────────────────────────────────
+
+/**
+ * For each slug in `subdomains`, creates `{slug}.{zoneName}` as a custom
+ * domain on the given Pages project.
+ *
+ * IMMUTABLE: after adding, any existing custom domain on the project
+ * that is NOT in the `subdomains` array is deleted. This makes the
+ * Pages domain list a pure function of the input array.
+ *
+ * @param subdomains   e.g. ["sapporo", "aomori", "sendai"]
+ * @param zoneName     e.g. "sushi.software"
+ * @param pagesProject e.g. "kamaji-project"
+ */
+export async function addPages(
+	subdomains: string[],
+	zoneName: string,
+	pagesProject: string,
+): Promise<void> {
+	const { accountId, apiToken } = getConfig();
+
+	// Build the full domain names from the array
+	const desiredDomains = new Set(
+		subdomains
+			.filter(Boolean)
+			.map((slug) => `${slug.toLowerCase()}.${zoneName}`),
+	);
+
+	console.log(
+		`🌐 Reconciling Pages domains for project "${pagesProject}" → [${[...desiredDomains].join(", ")}]`,
+	);
+
+	// 1. Fetch existing custom domains on the project
+	const listRes = await fetch(
+		`${CF_API}/accounts/${accountId}/pages/projects/${pagesProject}/domains`,
+		{ headers: cfHeaders(apiToken) },
+	);
+
+	if (!listRes.ok) {
+		const body = await listRes.text();
+		throw new Error(
+			`Failed to list Pages domains for "${pagesProject}": ${listRes.status} ${body}`,
+		);
+	}
+
+	const listResult = (await listRes.json()) as CfResult<PagesDomain[]>;
+	const existingDomains = listResult.result || [];
+	const existingSet = new Set(existingDomains.map((d) => d.name));
+
+	// 2. Create any desired domain that doesn't exist yet
+	for (const domain of desiredDomains) {
+		if (existingSet.has(domain)) {
+			console.log(`⏭️  Domain "${domain}" already exists, skipping`);
+			continue;
+		}
+
+		const createRes = await fetch(
+			`${CF_API}/accounts/${accountId}/pages/projects/${pagesProject}/domains`,
+			{
+				method: "POST",
+				headers: {
+					...cfHeaders(apiToken),
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({ name: domain }),
+			},
+		);
+
+		if (!createRes.ok) {
+			const errBody = await createRes.text();
+			console.error(
+				`❌ Failed to add domain "${domain}": ${createRes.status} ${errBody}`,
+			);
+			continue;
+		}
+
+		const createResult = (await createRes.json()) as CfResult<PagesDomain>;
+		if (!createResult.success) {
+			console.error(
+				`❌ API error for domain "${domain}":`,
+				createResult.errors,
+			);
+			continue;
+		}
+
+		console.log(`✅ Domain "${domain}" added to project "${pagesProject}"`);
+	}
+
+	// 3. Delete any existing domain NOT in the desired set (immutable reconciliation)
+	for (const existing of existingDomains) {
+		if (desiredDomains.has(existing.name)) continue;
+
+		// Skip the apex domain — we never want to delete sushi.software itself
+		if (existing.name === zoneName) {
+			console.log(`🛡️  Keeping apex "${zoneName}" (never deleted)`);
+			continue;
+		}
+
+		const delRes = await fetch(
+			`${CF_API}/accounts/${accountId}/pages/projects/${pagesProject}/domains/${encodeURIComponent(existing.name)}`,
+			{
+				method: "DELETE",
+				headers: cfHeaders(apiToken),
+			},
+		);
+
+		if (!delRes.ok) {
+			const errBody = await delRes.text();
+			console.error(
+				`❌ Failed to delete domain "${existing.name}": ${delRes.status} ${errBody}`,
+			);
+			continue;
+		}
+
+		console.log(`🗑️  Domain "${existing.name}" removed (not in array)`);
+	}
+
+	console.log(`✅ Pages domain reconciliation complete for "${pagesProject}"`);
+}
+
+// ──────────────────────────────────────────────
+// Multipart parsing helpers
+// ──────────────────────────────────────────────
+
+function extractBoundary(contentType: string): string | null {
+	const match = contentType.match(/boundary=(?:"([^"]+)"|([^;]+))/);
+	return match ? (match[1] || match[2] || "").trim() : null;
+}
+
+interface MultipartPart {
+	headers: Record<string, string>;
+	body: Buffer;
+	filename?: string;
+}
+
+function parseMultipart(
+	buffer: ArrayBuffer,
+	boundary: string,
+): MultipartPart[] {
+	const parts: MultipartPart[] = [];
+	const data = Buffer.from(buffer);
+	const sep = Buffer.from(`--${boundary}`);
+	const end = Buffer.from(`--${boundary}--`);
+
+	let start = 0;
+	while (true) {
+		const s = data.indexOf(sep, start);
+		if (s === -1) break;
+
+		// Check if this is the end boundary
+		if (data.indexOf(end, s) === s) break;
+
+		const partStart = s + sep.length;
+		const nextSep = data.indexOf(sep, partStart);
+		if (nextSep === -1) break;
+
+		const partData = data.subarray(partStart, nextSep);
+
+		// Split headers and body at \r\n\r\n
+		const headerEnd = partData.indexOf("\r\n\r\n");
+		if (headerEnd === -1) {
+			start = nextSep;
+			continue;
+		}
+
+		const headerStr = partData.subarray(0, headerEnd).toString("utf-8");
+		let body = partData.subarray(headerEnd + 4);
+
+		// Strip trailing \r\n
+		if (
+			body.length >= 2 &&
+			body[body.length - 2] === 0x0d &&
+			body[body.length - 1] === 0x0a
+		) {
+			body = body.subarray(0, body.length - 2);
+		}
+
+		const headers: Record<string, string> = {};
+		for (const line of headerStr.split("\r\n")) {
+			const idx = line.indexOf(":");
+			if (idx > 0) {
+				const key = line.substring(0, idx).trim().toLowerCase();
+				const val = line.substring(idx + 1).trim();
+				headers[key] = val;
+			}
+		}
+
+		// Extract filename from content-disposition
+		let filename: string | undefined;
+		const cd = headers["content-disposition"] || "";
+		const fnMatch = cd.match(/filename="([^"]+)"/);
+		if (fnMatch) filename = fnMatch[1];
+
+		parts.push({ headers, body, filename });
+		start = nextSep;
+	}
+
+	return parts;
+}
+
+// ──────────────────────────────────────────────
+// Prefecture data — Japan regions as Worker names
+// ──────────────────────────────────────────────
+
+export const prefectures: { region: string; cities: string[] }[] = [
+	{ region: "Hokkaido", cities: ["Sapporo"] },
+	{
+		region: "Tohoku",
+		cities: ["Aomori", "Morioka", "Sendai", "Akita", "Yamagata", "Fukushima"],
+	},
+	{
+		region: "Kanto",
+		cities: [
+			"Mito",
+			"Utsunomiya",
+			"Maebashi",
+			"Saitama",
+			"Chiba",
+			"Tokyo",
+			"Yokohama",
+		],
+	},
+	{
+		region: "Chubu",
+		cities: [
+			"Niigata",
+			"Toyama",
+			"Kanazawa",
+			"Fukui",
+			"Kofu",
+			"Nagano",
+			"Gifu",
+			"Shizuoka",
+			"Nagoya",
+		],
+	},
+	{
+		region: "Kansai",
+		cities: ["Tsu", "Otsu", "Kyoto", "Osaka", "Kobe", "Nara", "Wakayama"],
+	},
+	{
+		region: "Chugoku",
+		cities: ["Tottori", "Matsue", "Okayama", "Hiroshima", "Yamaguchi"],
+	},
+	{
+		region: "Shikoku",
+		cities: ["Tokushima", "Takamatsu", "Matsuyama", "Kochi"],
+	},
+	{
+		region: "KyushuOkinawa",
+		cities: [
+			"Fukuoka",
+			"Saga",
+			"Nagasaki",
+			"Kumamoto",
+			"Oita",
+			"Miyazaki",
+			"Kagoshima",
+			"Naha",
+		],
+	},
+];
+
+// Flatten all city names → Worker names (lowercase)
+export const prefectureWorkerNames: string[] = prefectures.flatMap((p) =>
+	p.cities.map((c) => c.toLowerCase()),
+);
+
+// ──────────────────────────────────────────────
+// Store names from the domains array (garden: true = store/worker)
+// ──────────────────────────────────────────────
+
+export const storeWorkerNames: string[] = [
+	"blossom",
+	"books",
+	"compass",
+	"movies",
+	"nexus",
+	"orbit",
+	"swarm",
+	"wasabi",
+	"wine",
+	"lifeos",
+	"sushi",
+	"popcorn",
+	"search",
+	"iliyan",
+];
+
+// ──────────────────────────────────────────────
+// Main entry — run both functions
+// ──────────────────────────────────────────────
+
+export async function main(): Promise<void> {
+	// All Worker names = stores + prefectures (deduplicated)
+	const allWorkerNames = [
+		...new Set([...storeWorkerNames, ...prefectureWorkerNames]),
+	];
+
+	console.log(
+		`🚀 Creating ${allWorkerNames.length} Workers (clone of "sushi")...`,
+	);
+	await addWorkers(allWorkerNames);
+
+	// Pages subdomains = same prefecture names as subdomains on sushi.software
+	const pagesSubdomains = prefectureWorkerNames;
+
+	console.log(`🌐 Adding ${pagesSubdomains.length} Pages custom domains...`);
+	await addPages(pagesSubdomains, "sushi.software", "kamaji-project");
+
+	console.log("✅ Done!");
+}
+
+// Run if called directly
+if (require.main === module) {
+	main().catch((err) => {
+		console.error("Fatal:", err);
+		process.exit(1);
+	});
+}
