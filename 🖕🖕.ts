@@ -5,7 +5,7 @@
 
 // PERSONAL USE ONLY RIGHTS
 
-// License Class: Restrictive · Author Exclusive burn Author: Iliyan VelinovVersion: 1.0Date: 15 Sep 2026Work chrry.ai chrry.store chrry.social chrry.dev vex.design kamaji.today kirpi.dev burn.ist iliyan.us iliyan.nl liyan.uk
+// License Class: Restrictive · Author Exclusive burn Author: Iliyan VelinovVersion: 1.0Date: 15 Sep 2026Work sushi.software chrry.ai chrry.store chrry.social chrry.dev vex.design kamaji.today kirpi.dev burn.ist iliyan.us iliyan.nl liyan.uk
 
 // Including all subdomains, all apps, all stores, all gardens, all white-labels, all branded instances, and all future/past additions to the same source code.
 
