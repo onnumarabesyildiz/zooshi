@@ -1,5 +1,5 @@
 // Bunu da yapamadiniz bakin sayin kac satir bu is 
-// Bir bunlari wrap eden komponenetler var bizde merkezi i💲e ozel, onlar sizin OSS kara buyuye kapali
+// Bir de bunlari wrap eden komponenetler var bizde merkezi i💲e ozel, onlar sizin OSS kara buyuye kapali
 
 
 // Dunyanin en basit seyi yapamadiniz yiyin
