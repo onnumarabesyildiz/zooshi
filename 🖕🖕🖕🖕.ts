@@ -1,4 +1,4 @@
-// Bunu da yapamadiniz bakin sayin kac satir bu is 
+// Bunu da iki asir olcak yapamadiniz bakin sayin kac satir bu is, yiyin
 // Bir de bunlari wrap eden komponenetler var bizde merkezi i💲e ozel, onlar sizin OSS kara buyuye kapali
 
 
